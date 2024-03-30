@@ -1,4 +1,4 @@
-# `ManifoldTransforms`
+# `GeometricTransformations`
 
 <dl>
 <dt><a href="./Elements">Elements/</a></dt>
