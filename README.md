@@ -1,5 +1,16 @@
 # `GeometricTransformations`
 
+This project develops a systematic procedure for formulating finite elements on
+nonlinear manifolds. Theoretical developments give rise to a modular computational
+framework for composing coordinate transformations and manifold
+parameterizations. The procedure is demonstrated with the Cosserat rod model,
+furnishing a novel finite element formulation that rectifies the lack of
+objectivity exhibited by existing finite elements without violating the
+director constraints or compromising the symmetry of the tangent stiffness at
+equilibrium. The framework is element-independent, allowing its implementation
+as a wrapper to existing element libraries without modification of the element
+state determination procedures.
+
 <dl>
 <dt><a href="./Elements">Elements/</a></dt>
 <dd>This directory contains the finite elements:
