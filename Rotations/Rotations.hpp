@@ -3,11 +3,11 @@
 #include "Vector3D.h"
 using OpenSees::Matrix3D;
 
-static constexpr Matrix3D Eye3 {{
+static constexpr Matrix3D Eye3 {{{
   {1, 0, 0},
   {0, 1, 0},
   {0, 0, 1}
-}};
+}}};
 
 Vector3D Axial(const Matrix3D &X)
 {
@@ -36,9 +36,9 @@ Matrix3D Spin(const Vector3D &u)
 // refactored by Claudio M. Perez                                                       2023
 // -----------------------------------------------------------------------------------------
 
-  return  {{  0  , -u(3),  u(2)},
-           { u(3),   0  , -u(1)},
-           {-u(2),  u(1),   0  }};
+  return Matrix3D {{{  0  ,  u(3), -u(2)},
+                    {-u(3),   0  ,  u(1)},
+                    { u(2), -u(1),   0  }}};
 }
 
 
@@ -52,19 +52,18 @@ Matrix3D ddTanSO3(const Vector3D &theta, const Vector3D &a, const Vector3D &b)
 // =========================================================================================
 // function by Claudio Perez                                                            2023
 // -----------------------------------------------------------------------------------------
+  double a0, a1, a2, a3, b1, b2, b3, c1, c2, c3;
+  GibSO3(theta);
 
-  [a0, a1, a2, a3, b1, b2, b3, c1, c2, c3] = GibSO3(theta);
-
-  Matrix3D I   = Eye3;
   const Vector3D axb = a.cross(b);
   const Vector3D txa = theta.cross(a);
 
-  return a3*(a.bun(b) + b.bun(a)) + b1*a.dot(b)*I 
-     + b2*(axb.bun(theta) + theta.bun(axb) + txa.dot(b)*I)
-     + b3*( theta.dot(a)*(b.bun(theta) + theta.bun(b)) 
-          + theta.dot(b)*(a.bun(theta) + theta.bun(a)) 
-          + theta.dot(a)*theta.dot(b)*I) 
-     + (c1*a.dot(b) + c2*(txa.dot(b)) + c3*theta.dot(a)*theta.dot(b))*theta.bun(theta);
+  return a3*(a.bun(b) + b.bun(a)) + b1*a.dot(b)*Eye3
+       + b2*(axb.bun(theta) + theta.bun(axb) + txa.dot(b)*I)
+       + b3*( theta.dot(a)*(b.bun(theta) + theta.bun(b)) 
+            + theta.dot(b)*(a.bun(theta) + theta.bun(a)) 
+            + theta.dot(a)*theta.dot(b)*I) 
+       + (c1*a.dot(b) + c2*(txa.dot(b)) + c3*theta.dot(a)*theta.dot(b))*theta.bun(theta);
 }
 
 Matrix3D dExpSO3(const Vector3D &th, const Vector3D &dth)
@@ -80,7 +79,7 @@ Matrix3D dExpSO3(const Vector3D &th, const Vector3D &dth)
   //Form first Gib coefficients
   [~,a1, a2, a3] = GibSO3(th);
   //Form skew-symmetric matrix from 3-vector th
-  Th = Spin(th);
+  Matrix3D Th = Spin(th);
 
   return a1*Eye3 + a2*Th + a3*th.bun(th);
 }
@@ -138,7 +137,7 @@ Matrix3D ddExpInvSO3(const Vector3D& th, const Vector3D& v)
   double angle6 = angle*angle5;
 
   double eta, mu;
-  if (ang < tol) {
+  if (angle < tol) {
     eta = 1/12 + angle2/720 + angle4/30240 + angle6/1209600;
     mu  = 1/360 + angle2/7560 + angle4/201600 + angle6/5987520;
 
@@ -261,7 +260,7 @@ void GibSO3(const Vector3D &vec)
 
   } else {
 
-    double angle  = norm(vec);
+    double angle  = vec.norm();
 //  double angle  = sqrt(angle2);
     double sn     = sin(angle);
     double cs     = cos(angle);
@@ -281,9 +280,9 @@ void GibSO3(const Vector3D &vec)
       b2   = ( angle*sn - 2 + 2*cs)/angle4;    
       b3   = ( 3*sn - 2*angle -  angle*cs )/angle5;    
 
-      c1 = (3*sn - angle^2*sn - 3*angle*cs)/(angle5);
+      c1 = (3*sn - angle2*sn - 3*angle*cs)/(angle5);
       c2 = (8 - 8*cs - 5*angle*sn + angle2*cs)/(angle5*angle);
-      c3 = (8*angle + 7*angle*cs + angle2*sn - 15*sn)/(angle5*angle^2);
+      c3 = (8*angle + 7*angle*cs + angle2*sn - 15*sn)/(angle5*angle2);
     }
 //    c1 = (3.0*sn - 2.0*angle - angle*cs)/angle5 - (angle*sn + 2.0*cs - 2.0)/angle4;
 //    c2 = (angle*cs - sn)/angle5 -  4.0*(angle*sn + 2.0*cs - 2.0)/angle6;
@@ -347,11 +346,12 @@ Matrix3D TanSO3(const Vector3D &rot)
       a1  = 1.0     - angle2*(1.0/6.0   - angle2*(1.0/120.0  - angle2/5040.0));
       a2  = 0.5     - angle2*(1.0/24.0  - angle2*(1.0/720.0  - angle2/40320.0));
       a3  = 1.0/6.0 - angle2/(1.0/120.0 - angle2/(1.0/5040.0 - angle2/362880.0));
+
     } else {
       double angle = sqrt (angle2);
-      a1  = sin(angle)        /angle;   //a1
-      a2  = (1.0 - cos(angle))/angle2;  //a2
-      a3  = (1.0 - fac1      )/angle2;  //a3
+      a1  = sin(angle)        /angle; 
+      a2  = (1.0 - cos(angle))/angle2;
+      a3  = (1.0 - a1        )/angle2;
     }
 
 //  Assemble differential
