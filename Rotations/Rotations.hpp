@@ -1,11 +1,12 @@
+
 Vector3D Axial(const Matrix3D &X)
 {
-//Return the axial vector x of the given skew-symmetric 3x3 matrix X.
+// Return the axial vector x of the given skew-symmetric 3x3 matrix X.
 // =========================================================================================
 // function by Claudio Perez                                                            2023
 // -----------------------------------------------------------------------------------------
 
-  x = [X(3,2); X(1,3); X(2,1)];
+  return {X(3,2); X(1,3); X(2,1)};
 }
 
 
@@ -25,7 +26,6 @@ Matrix3D ddExpInvSO3(const Vector3D& th, const Vector3D& v)
 
   double eta, mu;
   if (ang < tol) {
-//  dH = -0.5*Spin(v);
     eta = 1/12 + ang^2/720 + ang^4/30240 + ang^6/1209600;
     mu  = 1/360 + ang^2/7560 + ang^4/201600 + ang^6/5987520;
 
@@ -42,18 +42,7 @@ Matrix3D ddExpInvSO3(const Vector3D& th, const Vector3D& v)
   St2 = St2*St2;
   Matrix3D dH  = -0.5*Spin(v) + eta*(eye(3)*th.dot(v) + th.bun(v) - 2*v.bun(th)) + mu*St2*v.bun(th);
 
-
   return dH*dLogSO3(th);
-}
-
-Matrix3D ddExpSU2(q, mt) // -> H
-{
-// =========================================================================================
-// function by Claudio Perez                                                            2023
-// -----------------------------------------------------------------------------------------
-  qt  = q(1:3);
-  q0  = q(4);
-  return 2*qt.dot(mt)/q0^3*(qt.bun(qt)) + 2/q0*(qt.bun(mt) - mt.bun(qt) + qt.dot(mt)*eye(3)) + 2*spin(mt);
 }
 
 Matrix3D ddTanSO3(const Vector3D &theta, const Vector3D &a, const Vector3D &b)
@@ -66,15 +55,15 @@ Matrix3D ddTanSO3(const Vector3D &theta, const Vector3D &a, const Vector3D &b)
 // function by Claudio Perez                                                            2023
 // -----------------------------------------------------------------------------------------
 
-[a0, a1, a2, a3, b1, b2, b3, c1, c2, c3] = GibSO3(theta);
+  [a0, a1, a2, a3, b1, b2, b3, c1, c2, c3] = GibSO3(theta);
 
-Matrix3D I   = eye(3);
-return a3*(a.bun(b) + b.bun(a)) + b1*a.dot(b)*I 
-   + b2*(cross(a,b).bun(theta) + theta.bun(cross(a,b)) + cross(theta, a).dot(b)*I)
-   + b3*( theta.dot(a)*(b.bun(theta) + theta.bun(b)) 
-        + theta.dot(b)*(a.bun(theta) + theta.bun(a)) 
-        + theta.dot(a)*theta.dot(b)*I) 
-   + (c1*a.dot(b) + c2*(cross(theta,a).dot(b)) + c3*theta.dot(a)*theta.dot(b))*theta.bun(theta);
+  Matrix3D I   = eye(3);
+  return a3*(a.bun(b) + b.bun(a)) + b1*a.dot(b)*I 
+     + b2*(cross(a,b).bun(theta) + theta.bun(cross(a,b)) + cross(theta, a).dot(b)*I)
+     + b3*( theta.dot(a)*(b.bun(theta) + theta.bun(b)) 
+          + theta.dot(b)*(a.bun(theta) + theta.bun(a)) 
+          + theta.dot(a)*theta.dot(b)*I) 
+     + (c1*a.dot(b) + c2*(cross(theta,a).dot(b)) + c3*theta.dot(a)*theta.dot(b))*theta.bun(theta);
 }
 
 Matrix3D dExpSO3(const Vector3D &th, const Vector3D &dth)
@@ -105,7 +94,7 @@ Matrix3D dExpInvSO3(const Vector3D &v)
 
   Sv = Spin(v);
 
-  theta = v.norm();
+  double theta = v.norm();
   if (abs(theta) > pi/1.01) {
     v = v - 2*v/theta*floor(theta + pi)/2;
     theta = norm(v);
@@ -289,7 +278,7 @@ Vector3D LogSO3(const Matrix3D &R)
 }
 
 
-Matrix3D Spin(u)
+Matrix3D Spin(const Vector3D &u)
 {
 //SPIN determine the spin tensor of a vector
 // S = SPIN (U)
@@ -306,9 +295,9 @@ Matrix3D Spin(u)
 // refactored by Claudio M. Perez                                                       2023
 // -----------------------------------------------------------------------------------------
 
-S = [   0    -u(3)  u(2)  
-       u(3)    0   -u(1)  
-      -u(2)   u(1)   0   ];
+  return  {{  0  , -u(3),  u(2)},
+           { u(3),   0  , -u(1)},
+           {-u(2),  u(1),   0  }};
 }
 
 Matrix3D TanSO3(const Vector3D &rot)
@@ -319,8 +308,7 @@ Matrix3D TanSO3(const Vector3D &rot)
 // function by Claudio Perez                                                            2023
 // -----------------------------------------------------------------------------------------
 
-//  Compute norm of rot
-    angle2 = rot(1)*rot(1) + rot(2)*rot(2) + rot(3)*rot(3);
+    double angle2 = rot.dot(rot);
 
 //  Check for angle near 0
     if (angle2 < 1e-08) {
@@ -349,19 +337,3 @@ Matrix3D TanSO3(const Vector3D &rot)
 }
 
 
-Matrix3D ExpSU2(qhat)
-{
-// =========================================================================================
-// FEDEASLab - Release 5.2, July 2021
-// Matlab Finite Elements for Design, Evaluation and Analysis of Structures
-// Professor Filip C. Filippou (filippou@berkeley.edu)
-// Department of Civil and Environmental Engineering, UC Berkeley
-// Copyright(c) 1998-2021. The Regents of the University of California. All Rights Reserved.
-// =========================================================================================
-// function by Veronique LeCorvec                                                    08-2008
-// -----------------------------------------------------------------------------------------
-  q  = qhat(1:3);
-  q0 = qhat(4);
-
-  return (q0^2 - q' * q)*eye(3) + 2.* (q * q') + 2.*q0.*Spin(q);
-}
