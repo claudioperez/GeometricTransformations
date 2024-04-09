@@ -7,10 +7,14 @@ A framework for *geometrically exact* finite elment analysis
 
 > **This is a partial repository; an upload of the full project is in progress**
 
-This project develops a systematic procedure for formulating finite elements on
-nonlinear manifolds. Theoretical developments give rise to a modular computational
+This project implements a framework for simulating differential equations on
+nonlinear manifolds. 
+<!--
+Theoretical developments give rise to a modular computational
 framework for composing coordinate transformations and manifold
-parameterizations. The procedure is demonstrated with the Cosserat rod model,
+parameterizations. 
+-->
+The procedure is demonstrated with the Cosserat rod model,
 furnishing a novel finite element formulation that rectifies the lack of
 objectivity exhibited by existing finite elements without violating the
 director constraints or compromising the symmetry of the tangent stiffness at
