@@ -1,5 +1,7 @@
 # `GeometricTransformations`
 
+> **This is a partial repository; an upload of the full project is in progress**
+
 This project develops a systematic procedure for formulating finite elements on
 nonlinear manifolds. Theoretical developments give rise to a modular computational
 framework for composing coordinate transformations and manifold
