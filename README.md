@@ -1,8 +1,9 @@
 # `GeometricTransformations`
 
-<center>
+
 A framework for *geometrically exact* finite elment analysis
-</center>
+
+--------------------------------------------------
 
 > **This is a partial repository; an upload of the full project is in progress**
 
