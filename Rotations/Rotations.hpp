@@ -59,10 +59,10 @@ Matrix3D ddTanSO3(const Vector3D &theta, const Vector3D &a, const Vector3D &b)
   const Vector3D txa = theta.cross(a);
 
   return a3*(a.bun(b) + b.bun(a)) + b1*a.dot(b)*Eye3
-       + b2*(axb.bun(theta) + theta.bun(axb) + txa.dot(b)*I)
+       + b2*(axb.bun(theta) + theta.bun(axb) + txa.dot(b)*Eye3)
        + b3*( theta.dot(a)*(b.bun(theta) + theta.bun(b)) 
             + theta.dot(b)*(a.bun(theta) + theta.bun(a)) 
-            + theta.dot(a)*theta.dot(b)*I) 
+            + theta.dot(a)*theta.dot(b)*Eye3) 
        + (c1*a.dot(b) + c2*(txa.dot(b)) + c3*theta.dot(a)*theta.dot(b))*theta.bun(theta);
 }
 
@@ -241,10 +241,9 @@ void GibSO3(const Vector3D &vec)
 // function by Claudio Perez                                                            2023
 // -----------------------------------------------------------------------------------------
 //
-  double angle2 =  vec.dot(vec);  //= angle^2;
+  double angle2 =  vec.dot(vec);
   double a0, a1, a2, a3, b1, b2, b3, c1, c2, c3;
 
-//if angle  <= 1e-12
   if (angle2  <= 1e-07) {
 
     a0    =   0.0;
@@ -284,9 +283,6 @@ void GibSO3(const Vector3D &vec)
       c2 = (8 - 8*cs - 5*angle*sn + angle2*cs)/(angle5*angle);
       c3 = (8*angle + 7*angle*cs + angle2*sn - 15*sn)/(angle5*angle2);
     }
-//    c1 = (3.0*sn - 2.0*angle - angle*cs)/angle5 - (angle*sn + 2.0*cs - 2.0)/angle4;
-//    c2 = (angle*cs - sn)/angle5 -  4.0*(angle*sn + 2.0*cs - 2.0)/angle6;
-//    c3 = ((angle*sn + 2.0*cs - 2.0)/angle4 -  5.0*((3.0*sn - 2.0*angle -  angle*cs)/angle5))/angle2;
   }
 }
 
@@ -330,7 +326,7 @@ Vector3D LogSO3(const Matrix3D &R)
 }
 
 
-Matrix3D TanSO3(const Vector3D &rot)
+Matrix3D TanSO3(const Vector3D &vec)
 {
 //  Compute right differential of the exponential.
 //
@@ -338,7 +334,7 @@ Matrix3D TanSO3(const Vector3D &rot)
 // function by Claudio Perez                                                            2023
 // -----------------------------------------------------------------------------------------
 
-    double angle2 = rot.dot(rot);
+    double angle2 = vec.dot(vec);
     double a1, a2, a3;
 
 //  Check for angle near 0
@@ -356,15 +352,15 @@ Matrix3D TanSO3(const Vector3D &rot)
 
 //  Assemble differential
     Matrix3D T;
-    T(1,1)  =         a1 + a3*rot(1)*rot(1);
-    T(1,2)  = -rot(3)*a2 + a3*rot(1)*rot(2);
-    T(1,3)  =  rot(2)*a2 + a3*rot(1)*rot(3);
-    T(2,1)  =  rot(3)*a2 + a3*rot(2)*rot(1);
-    T(2,2)  =         a1 + a3*rot(2)*rot(2);
-    T(2,3)  = -rot(1)*a2 + a3*rot(2)*rot(3);
-    T(3,1)  = -rot(2)*a2 + a3*rot(3)*rot(1);
-    T(3,2)  =  rot(1)*a2 + a3*rot(3)*rot(2);
-    T(3,3)  =         a1 + a3*rot(3)*rot(3);
+    T(1,1)  =         a1 + a3*vec[1]*vec[1];
+    T(1,2)  = -vec[3]*a2 + a3*vec[1]*vec[2];
+    T(1,3)  =  vec[2]*a2 + a3*vec[1]*vec[3];
+    T(2,1)  =  vec[3]*a2 + a3*vec[2]*vec[1];
+    T(2,2)  =         a1 + a3*vec[2]*vec[2];
+    T(2,3)  = -vec[1]*a2 + a3*vec[2]*vec[3];
+    T(3,1)  = -vec[2]*a2 + a3*vec[3]*vec[1];
+    T(3,2)  =  vec[1]*a2 + a3*vec[3]*vec[2];
+    T(3,3)  =         a1 + a3*vec[3]*vec[3];
     return T;
 }
 
