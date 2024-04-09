@@ -1,3 +1,13 @@
+#include <math.h>
+#include "Matrix3D.h"
+#include "Vector3D.h"
+using OpenSees::Matrix3D;
+
+static constexpr Matrix3D Eye3 {{
+  {1, 0, 0},
+  {0, 1, 0},
+  {0, 0, 1}
+}};
 
 Vector3D Axial(const Matrix3D &X)
 {
@@ -6,44 +16,32 @@ Vector3D Axial(const Matrix3D &X)
 // function by Claudio Perez                                                            2023
 // -----------------------------------------------------------------------------------------
 
-  return {X(3,2); X(1,3); X(2,1)};
+  return {X(3,2), X(1,3), X(2,1)};
 }
 
-
-Matrix3D ddExpInvSO3(const Vector3D& th, const Vector3D& v)
+Matrix3D Spin(const Vector3D &u)
 {
+//SPIN determine the spin tensor of a vector
+// S = SPIN (U)
+// the function determines the spin tensor S of a vector U with three components
+ 
 // =========================================================================================
-// function by Claudio Perez                                                            2023
+// FEDEASLab - Release 5.2, July 2021
+// Matlab Finite Elements for Design, Evaluation and Analysis of Structures
+// Professor Filip C. Filippou (filippou@berkeley.edu)
+// Department of Civil and Environmental Engineering, UC Berkeley
+// Copyright(c) 1998-2021. The Regents of the University of California. All Rights Reserved.
+// =========================================================================================
+// function by Veronique LeCorvec                                                    08-2008
+// refactored by Claudio M. Perez                                                       2023
 // -----------------------------------------------------------------------------------------
 
-  constexpr double tol = 1/20;
-  double ang = th.norm();
-
-  if (fabs(ang) > pi/1.01) {
-    v = v - 2*v/ang*floor(ang + pi)/2;
-    ang = norm(v);
-  }
-
-  double eta, mu;
-  if (ang < tol) {
-    eta = 1/12 + ang^2/720 + ang^4/30240 + ang^6/1209600;
-    mu  = 1/360 + ang^2/7560 + ang^4/201600 + ang^6/5987520;
-
-  } else {
-    double an2 = ang/2;
-    double sn  = sin(an2);
-    double cs  = cos(an2);
-
-    eta = (sn - an2*cs)/(ang^2*sn);
-    mu  = (ang*(ang+2*sn*cs) - 8*sn*sn)/(4*ang^4*sn*sn);
-  }
-
-  Matrix3D St2 = Spin(th);
-  St2 = St2*St2;
-  Matrix3D dH  = -0.5*Spin(v) + eta*(eye(3)*th.dot(v) + th.bun(v) - 2*v.bun(th)) + mu*St2*v.bun(th);
-
-  return dH*dLogSO3(th);
+  return  {{  0  , -u(3),  u(2)},
+           { u(3),   0  , -u(1)},
+           {-u(2),  u(1),   0  }};
 }
+
+
 
 Matrix3D ddTanSO3(const Vector3D &theta, const Vector3D &a, const Vector3D &b)
 {
@@ -57,13 +55,16 @@ Matrix3D ddTanSO3(const Vector3D &theta, const Vector3D &a, const Vector3D &b)
 
   [a0, a1, a2, a3, b1, b2, b3, c1, c2, c3] = GibSO3(theta);
 
-  Matrix3D I   = eye(3);
+  Matrix3D I   = Eye3;
+  const Vector3D axb = a.cross(b);
+  const Vector3D txa = theta.cross(a);
+
   return a3*(a.bun(b) + b.bun(a)) + b1*a.dot(b)*I 
-     + b2*(cross(a,b).bun(theta) + theta.bun(cross(a,b)) + cross(theta, a).dot(b)*I)
+     + b2*(axb.bun(theta) + theta.bun(axb) + txa.dot(b)*I)
      + b3*( theta.dot(a)*(b.bun(theta) + theta.bun(b)) 
           + theta.dot(b)*(a.bun(theta) + theta.bun(a)) 
           + theta.dot(a)*theta.dot(b)*I) 
-     + (c1*a.dot(b) + c2*(cross(theta,a).dot(b)) + c3*theta.dot(a)*theta.dot(b))*theta.bun(theta);
+     + (c1*a.dot(b) + c2*(txa.dot(b)) + c3*theta.dot(a)*theta.dot(b))*theta.bun(theta);
 }
 
 Matrix3D dExpSO3(const Vector3D &th, const Vector3D &dth)
@@ -81,7 +82,7 @@ Matrix3D dExpSO3(const Vector3D &th, const Vector3D &dth)
   //Form skew-symmetric matrix from 3-vector th
   Th = Spin(th);
 
-  return a1*eye(3) + a2*Th + a3*th.bun(th);
+  return a1*Eye3 + a2*Th + a3*th.bun(th);
 }
 
 Matrix3D dExpInvSO3(const Vector3D &v)
@@ -92,24 +93,72 @@ Matrix3D dExpInvSO3(const Vector3D &v)
 //
   constexpr double tol = 1/20;
 
-  Sv = Spin(v);
+  Matrix3D Sv = Spin(v);
 
-  double theta = v.norm();
-  if (abs(theta) > pi/1.01) {
-    v = v - 2*v/theta*floor(theta + pi)/2;
-    theta = norm(v);
+  double angle = v.norm();
+  if (abs(angle) > M_PI/1.01) {
+    v = v - 2*v/angle*floor(angle + M_PI)/2;
+    angle = v.norm();
   }
 
+  double angle2 = angle*angle;
+  double angle3 = angle*angle2;
+  double angle4 = angle*angle3;
+  double angle5 = angle*angle4;
+  double angle6 = angle*angle5;
 
-  if (theta > tol) {
-    eta = (1-0.5*theta*cot(0.5*theta))/theta^2;
+  double eta;
+  if (angle > tol) {
+    eta = (1-0.5*angle*cot(0.5*angle))/angle2;
   } else {
-    eta = 1/12 + theta^2/720 + theta^4/30240 + theta^6/1209600;
+    eta = 1/12 + angle2/720 + angle4/30240 + angle6/1209600;
   }
-  return eye(3) - 1/2*Sv + eta*Sv*Sv;
+  return Eye3 - 0.5*Sv + eta*Sv*Sv;
 }
 
-Matrix3D dTanSO3(const Vector3D &th, const Vector3D &a, repr)
+Matrix3D ddExpInvSO3(const Vector3D& th, const Vector3D& v)
+{
+// =========================================================================================
+// function by Claudio Perez                                                            2023
+// -----------------------------------------------------------------------------------------
+
+  constexpr double tol = 1/20;
+  double angle = th.norm();
+
+  if (fabs(angle) > M_PI/1.01) {
+    v = v - 2*v/angle*floor(angle + M_PI)/2;
+    angle = v.norm();
+  }
+
+  
+  double angle2 = angle*angle;
+  double angle3 = angle*angle2;
+  double angle4 = angle*angle3;
+  double angle5 = angle*angle4;
+  double angle6 = angle*angle5;
+
+  double eta, mu;
+  if (ang < tol) {
+    eta = 1/12 + angle2/720 + angle4/30240 + angle6/1209600;
+    mu  = 1/360 + angle2/7560 + angle4/201600 + angle6/5987520;
+
+  } else {
+    double an2 = angle/2;
+    double sn  = sin(an2);
+    double cs  = cos(an2);
+
+    eta = (sn - angle2*cs)/(angle2*sn);
+    mu  = (angle*(angle + 2*sn*cs) - 8*sn*sn)/(4*angle4*sn*sn);
+  }
+
+  Matrix3D St2 = Spin(th);
+  St2 = St2*St2;
+  Matrix3D dH  = -0.5*Spin(v) + eta*(Eye3*th.dot(v) + th.bun(v) - 2*v.bun(th)) + mu*St2*v.bun(th);
+
+  return dH*dLogSO3(th);
+}
+
+Matrix3D dTanSO3(const Vector3D &th, const Vector3D &a, char repr)
 {
 //
 // repr     'L' or 'R' indicating left or right representation, 
@@ -125,14 +174,16 @@ Matrix3D dTanSO3(const Vector3D &th, const Vector3D &a, repr)
 
   [~, a1, a2, a3, b1, b2, b3] = GibSO3(th);
 
-  I   = eye(3);
+  Matrix3D txaot = th.cross(a).bun(th);
+
+  Matrix3D Xi;
   switch (repr) {
     case 'R':
-      Xi = - a2*Spin(a) + a3*th.dot(a)*I + a3*th.bun(a)
-           + b1*a.bun(th) + b2*cross(th,a).bun(th) + b3*th.dot(a)*th.bun(th);
+      Xi = - a2*Spin(a) + a3*th.dot(a)*Eye3 + a3*th.bun(a)
+           + b1*a.bun(th) + b2*txaot + b3*th.dot(a)*th.bun(th);
     case 'L':
-      Xi =   a2*Spin(a) + a3*th.dot(a)*I + a3*th.bun(a)
-           + b1*a.bun(th) - b2*cross(th,a).bun(th) + b3*th.dot(a)*th.bun(th);
+      Xi =   a2*Spin(a) + a3*th.dot(a)*Eye3 + a3*th.bun(a)
+           + b1*a.bun(th) - b2*txaot + b3*th.dot(a)*th.bun(th);
   }
   return Xi;
 }
@@ -149,12 +200,13 @@ Matrix3D ExpSO3(const Vector3D &th, const Vector3D &other)
   //Form 3x3 skew-symmetric matrix Th from axial vector th
   Matrix3D Th = Spin(th);
 
-  return eye(3) + a1*Th + a2*Th*Th;
+  return Eye3 + a1*Th + a2*Th*Th;
 
 }
 
 
-function [a0, a1, a2, a3, b1, b2, b3, c1, c2, c3] = GibSO3(vec)
+void GibSO3(const Vector3D &vec)
+{
 //
 //Compute coefficients of the Rodrigues formula and their derivatives.
 //
@@ -191,6 +243,7 @@ function [a0, a1, a2, a3, b1, b2, b3, c1, c2, c3] = GibSO3(vec)
 // -----------------------------------------------------------------------------------------
 //
   double angle2 =  vec.dot(vec);  //= angle^2;
+  double a0, a1, a2, a3, b1, b2, b3, c1, c2, c3;
 
 //if angle  <= 1e-12
   if (angle2  <= 1e-07) {
@@ -208,14 +261,14 @@ function [a0, a1, a2, a3, b1, b2, b3, c1, c2, c3] = GibSO3(vec)
 
   } else {
 
-    angle  = norm(vec);
-//  angle  = sqrt(angle2);
-    sn     = sin(angle);
-    cs     = cos(angle);
-    angle3 = angle*angle2; //.^3; //
-    angle4 = angle*angle3; //.^4; //
-    angle5 = angle*angle4; //.^5; //
-    angle6 = angle*angle5; //.^6; //
+    double angle  = norm(vec);
+//  double angle  = sqrt(angle2);
+    double sn     = sin(angle);
+    double cs     = cos(angle);
+    double angle3 = angle*angle2;
+    double angle4 = angle*angle3;
+    double angle5 = angle*angle4;
+    double angle6 = angle*angle5;
                                                     
     a0   = cs;
     a1   = sn / angle;   
@@ -229,7 +282,7 @@ function [a0, a1, a2, a3, b1, b2, b3, c1, c2, c3] = GibSO3(vec)
       b3   = ( 3*sn - 2*angle -  angle*cs )/angle5;    
 
       c1 = (3*sn - angle^2*sn - 3*angle*cs)/(angle5);
-      c2 = (8 - 8*cs - 5*angle*sn + angle^2*cs)/(angle5*angle);
+      c2 = (8 - 8*cs - 5*angle*sn + angle2*cs)/(angle5*angle);
       c3 = (8*angle + 7*angle*cs + angle2*sn - 15*sn)/(angle5*angle^2);
     }
 //    c1 = (3.0*sn - 2.0*angle - angle*cs)/angle5 - (angle*sn + 2.0*cs - 2.0)/angle4;
@@ -278,28 +331,6 @@ Vector3D LogSO3(const Matrix3D &R)
 }
 
 
-Matrix3D Spin(const Vector3D &u)
-{
-//SPIN determine the spin tensor of a vector
-// S = SPIN (U)
-// the function determines the spin tensor S of a vector U with three components
- 
-// =========================================================================================
-// FEDEASLab - Release 5.2, July 2021
-// Matlab Finite Elements for Design, Evaluation and Analysis of Structures
-// Professor Filip C. Filippou (filippou@berkeley.edu)
-// Department of Civil and Environmental Engineering, UC Berkeley
-// Copyright(c) 1998-2021. The Regents of the University of California. All Rights Reserved.
-// =========================================================================================
-// function by Veronique LeCorvec                                                    08-2008
-// refactored by Claudio M. Perez                                                       2023
-// -----------------------------------------------------------------------------------------
-
-  return  {{  0  , -u(3),  u(2)},
-           { u(3),   0  , -u(1)},
-           {-u(2),  u(1),   0  }};
-}
-
 Matrix3D TanSO3(const Vector3D &rot)
 {
 //  Compute right differential of the exponential.
@@ -309,30 +340,31 @@ Matrix3D TanSO3(const Vector3D &rot)
 // -----------------------------------------------------------------------------------------
 
     double angle2 = rot.dot(rot);
+    double a1, a2, a3;
 
 //  Check for angle near 0
     if (angle2 < 1e-08) {
-      fac1  = 1.0     - angle2*(1.0/6.0   - angle2*(1.0/120.0  - angle2/5040.0));
-      fac2  = 0.5     - angle2*(1.0/24.0  - angle2*(1.0/720.0  - angle2/40320.0));
-      fac3  = 1.0/6.0 - angle2/(1.0/120.0 - angle2/(1.0/5040.0 - angle2/362880.0));
+      a1  = 1.0     - angle2*(1.0/6.0   - angle2*(1.0/120.0  - angle2/5040.0));
+      a2  = 0.5     - angle2*(1.0/24.0  - angle2*(1.0/720.0  - angle2/40320.0));
+      a3  = 1.0/6.0 - angle2/(1.0/120.0 - angle2/(1.0/5040.0 - angle2/362880.0));
     } else {
-      angle = sqrt (angle2);
-      fac1  = sin(angle)        /angle;   //a1
-      fac2  = (1.0 - cos(angle))/angle2;  //a2
-      fac3  = (1.0 - fac1      )/angle2;  //a3
+      double angle = sqrt (angle2);
+      a1  = sin(angle)        /angle;   //a1
+      a2  = (1.0 - cos(angle))/angle2;  //a2
+      a3  = (1.0 - fac1      )/angle2;  //a3
     }
 
 //  Assemble differential
-    Matrix3D t;
-    T(1,1)  =         fac1 + fac3*rot(1)*rot(1);
-    T(1,2)  = -rot(3)*fac2 + fac3*rot(1)*rot(2);
-    T(1,3)  =  rot(2)*fac2 + fac3*rot(1)*rot(3);
-    T(2,1)  =  rot(3)*fac2 + fac3*rot(2)*rot(1);
-    T(2,2)  =         fac1 + fac3*rot(2)*rot(2);
-    T(2,3)  = -rot(1)*fac2 + fac3*rot(2)*rot(3);
-    T(3,1)  = -rot(2)*fac2 + fac3*rot(3)*rot(1);
-    T(3,2)  =  rot(1)*fac2 + fac3*rot(3)*rot(2);
-    T(3,3)  =         fac1 + fac3*rot(3)*rot(3);
+    Matrix3D T;
+    T(1,1)  =         a1 + a3*rot(1)*rot(1);
+    T(1,2)  = -rot(3)*a2 + a3*rot(1)*rot(2);
+    T(1,3)  =  rot(2)*a2 + a3*rot(1)*rot(3);
+    T(2,1)  =  rot(3)*a2 + a3*rot(2)*rot(1);
+    T(2,2)  =         a1 + a3*rot(2)*rot(2);
+    T(2,3)  = -rot(1)*a2 + a3*rot(2)*rot(3);
+    T(3,1)  = -rot(2)*a2 + a3*rot(3)*rot(1);
+    T(3,2)  =  rot(1)*a2 + a3*rot(3)*rot(2);
+    T(3,3)  =         a1 + a3*rot(3)*rot(3);
     return T;
 }
 
