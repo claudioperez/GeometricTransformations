@@ -1,1 +1,2 @@
-opensees
+opensees>=0.0.57
+sees
