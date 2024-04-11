@@ -81,4 +81,40 @@ For an example using "basic" elements, see <a href="./Examples/E00_Column.m"><co
 
 </dl>
 
+<table align="center" style="border: 0;">
+ <tr style="background-color:rgba(0, 0, 0, 0);">
+  <td style="background-color:rgba(0, 0, 0, 0);" colspan="3">
+    <a>
+    <img src="./Figures/Figure_4a.png" 
+         width="600" alt="OpenSeesRT Logo">
+    </a>
+  </td>
+ </tr>
+
+<tr>
+  <td>
+    <a href="https://peer.berkeley.edu">
+    <img src="./Figures/Figure_4b.png"
+         alt="PEER Logo" width="200"/>
+    </a>
+  </td>
+
+  <td>
+    <a href="https://dot.ca.gov/">
+    <img src="./Figures/Figure_.png"
+         alt="Caltrans Logo" width="200"/>
+    </a>
+  </td>
+
+  <td>
+    <a href="https://brace2.herokuapp.com">
+    <img src="./Figures/Figure_.png"
+         alt="BRACE2 Logo" width="200"/>
+    </a>
+  </td>
+ 
+ </tr>
+</table>
+
+
 
