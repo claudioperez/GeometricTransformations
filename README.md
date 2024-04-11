@@ -26,6 +26,11 @@ state determination procedures.
 <dt><a href="./Elements">Elements/</a></dt>
 <dd>This directory contains the finite elements:
   <ul> 
+    <li><a href="./Elements/DisplShear3dFrm_wCS.m"><code>DisplShear3dFrm_wCS</code></a> 
+       Displacement-interpolated shear 3d frame element with Cosserat strains; 
+       this element implements the three geometrically exact beam formulations 
+       presented in Appendix B.
+    </li>
     <li><a href="./Elements/GeomWrap3dFrm.m"><code>GeomWrap3dFrm</code></a> Wrapper for 3d frame elements. This element
        implements the <em>element wrapper</em> from Section 6 using Algorithm 1
        from Section 4.
@@ -34,10 +39,6 @@ state determination procedures.
        that are formulated in a <em>basic</em> coordinate system. This element
        implements the <em>element wrapper</em> from Section 6 using Algorithm 1
        from Section 4.
-    </li>
-    <li><a href="./Elements/DisplShear3dFrm_wCS.m"><code>DisplShear3dFrm_wCS</code></a> 
-       Displacement-interpolated shear 3d frame element with Cosserat strains; 
-       this element implements the three formulations of Appendix B.
     </li>
   </ul>
 </dd>
