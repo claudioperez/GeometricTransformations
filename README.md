@@ -60,6 +60,10 @@ state determination procedures.
     </li>
   </ul>
 </dd>
+<dt><a href="./Rotations">Rotations/</a></dt>
+<dd>This directory contains the rotation functions described in Appendix A.
+</dd>
+
 <dt><a href="./Examples">Examples/</a></dt>
 <dd>
   This directory contains scripts to reproduce the examples of the paper.
@@ -74,12 +78,9 @@ state determination procedures.
   <li><a href="./Examples/E50_Hockling.m">Hockling of a flexible rod.</a></li>
   </ol>
 </dd>
-For an example using "basic" elements, see <a href="./Examples/E00_Column.m"><code>E00_Column</code></a>.
-<dt><a href="./Rotations">Rotations/</a></dt>
-<dd>This directory contains the rotation functions described in Appendix A.
-</dd>
-
 </dl>
+
+For an example using "basic" elements, see <a href="./Examples/E00_Column.m"><code>E00_Column</code></a>.
 
 <table align="center" style="border: 0;">
  <tr style="background-color:rgba(0, 0, 0, 0);">
