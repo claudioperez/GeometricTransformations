@@ -92,31 +92,9 @@ For an example using "basic" elements, see <a href="./Examples/E00_Column.m"><co
     </a>
   </td>
  </tr>
-
-<tr>
-  <td>
-    <a href="https://peer.berkeley.edu">
-    <img src="./Figures/Figure_4b.png"
-         alt="PEER Logo" width="200"/>
-    </a>
-  </td>
-
-  <td>
-    <a href="https://dot.ca.gov/">
-    <img src="./Figures/Figure_.png"
-         alt="Caltrans Logo" width="200"/>
-    </a>
-  </td>
-
-  <td>
-    <a href="https://brace2.herokuapp.com">
-    <img src="./Figures/Figure_.png"
-         alt="BRACE2 Logo" width="200"/>
-    </a>
-  </td>
- 
- </tr>
 </table>
 
 
+- Perez CM, Filippou FC. On nonlinear geometric transformations of finite elements. Int
+  J Numer Methods Eng. 2024;e7506. doi: 10.1002/nme.7506
 
