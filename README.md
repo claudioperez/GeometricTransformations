@@ -1,7 +1,9 @@
 # `GeometricTransformations`
 
 
-A framework for *geometrically exact* finite elment analysis
+A framework for geometrically exact finite elment analysis
+
+[![DOI:10.1002/nme.7506](https://zenodo.org/badge/DOI/10.1002/nme.7506.svg)](https://doi.org/10.1002/nme.7506)
 
 --------------------------------------------------
 
