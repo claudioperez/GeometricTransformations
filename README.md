@@ -83,7 +83,7 @@ state determination procedures.
 </dd>
 </dl>
 
-For an example using "basic" elements, see <a href="./Examples/E00_Column.m"><code>E00_Column</code></a>.
+For an example using "basic" elements, see <a href="./Examples/E00_Cantilever.m"><code>E00_Cantilever</code></a>.
 
 <table align="center" style="border: 0;">
  <tr style="background-color:rgba(0, 0, 0, 0);">
