@@ -1,7 +1,7 @@
 # `GeometricTransformations`
 
 
-A framework for geometrically exact finite elment analysis
+A framework for geometrically exact finite element analysis
 
 [![DOI:10.1002/nme.7506](https://zenodo.org/badge/DOI/10.1002/nme.7506.svg)](https://doi.org/10.1002/nme.7506)
 
@@ -16,13 +16,11 @@ Theoretical developments give rise to a modular computational
 framework for composing coordinate transformations and manifold
 parameterizations. 
 -->
-The procedure is demonstrated with the Cosserat rod model,
-furnishing a novel finite element formulation that rectifies the lack of
-objectivity exhibited by existing finite elements without violating the
-director constraints or compromising the symmetry of the tangent stiffness at
-equilibrium. The framework is element-independent, allowing its implementation
-as a wrapper to existing element libraries without modification of the element
-state determination procedures.
+This repository contains the source code for the investigation presented by Perez and Filippou (2024).
+The MATLAB implementation requires the [FEDEASLab](https://fedeas.net) toolbox for nonlinear structural analysis
+which may be obtained from the author upon reasonable request.
+A completely open-source C++ implementation of the framework is under development 
+for OpenSees and expected to be completed by 2025.
 
 <dl>
 <dt><a href="./Elements">Elements/</a></dt>
