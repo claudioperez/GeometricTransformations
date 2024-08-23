@@ -27,7 +27,7 @@ at https://github.com/claudioperez/OpenSeesRT.
 <dt><a href="./Elements">Elements/</a></dt>
 <dd>This directory contains the finite elements:
   <ul> 
-    <li><a href="./Elements/DisplShear3dFrm_wCS.m"><code>DisplShear3dFrm_wCS</code></a> 
+    <li><a href="./Elements/ExactShear3dFrm.m"><code>ExactShear3dFrm</code></a> 
        Displacement-interpolated shear 3d frame element with Cosserat strains; 
        this element implements the three geometrically exact beam formulations 
        presented in Appendix B.
@@ -63,7 +63,7 @@ at https://github.com/claudioperez/OpenSeesRT.
   </ul>
 </dd>
 <dt><a href="./Rotations">Rotations/</a></dt>
-<dd>This directory contains the rotation functions described in Appendix A.
+<dd>This directory contains the rotation functions described in Appendix A of Perez and Filippou (2024).
 </dd>
 
 <dt><a href="./Examples">Examples/</a></dt>
