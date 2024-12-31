@@ -5,9 +5,9 @@ function ElemResp = Prism3dFrm(action,el_no,xyz,ElemData,ElemState)
 %
 %       [k,v0] = EulerOrder00(L,ElemData,v);
 %       [k,v0] = ShearOrder00(L,ElemData,v)
-%       [k,v0] = EulerOrder02(L,ElemData,v);
+%       [k,v0] = AxialPrism3D(L,ElemData,v);
 %
-%       k = hinge_stiff(k,ElemData);
+%       k = TangentRelease(k,ElemData);
 %
 %
 %  =========================================================================================
@@ -34,8 +34,11 @@ switch action
 %% Return element type information 
   case 'type'
     ElemResp = ElemType;
-%   ElemResp.Solve  = ElemData.Update;
-    ElemResp.Petrov = ElemData.Petrov;
+    if isfield(ElemData, "Petrov")
+      ElemResp.Petrov = ElemData.Petrov;
+    else
+      ElemResp.Petrov = false;
+    end
     return
 
 %% check element data; assign default values, if necessary
@@ -65,38 +68,44 @@ if isfield(ElemData, 'GeomData')
 end
 GeomData.JntOff = ElemData.JntOff;
 GeomData.yornt  = ElemData.yornt;
-% extract element loading value w
+% Extract element loading value w
 w = ElemData.w;
 
 % ==========================================================================================
-%% element actions
+
+%% Element actions
 ElemResp = [];  % if not otherwise specified, ElemResp is empty
 switch action
   case 'init'
     %% initialization and specification of history variables
     ElemState.Pres = []; % history array is empty for linear element
     ElemResp       = ElemState;
+
 % ==========================================================================================
   case {'basic'}
     %% basic force-deformation
     L     = ElmLenOr(xyz+GeomData.JntOff);
     v     = ElemState;
+    lamda = 1.0; % TODO NaN;
     switch ElemData.Shear
       case 0
         switch ElemData.Form
           case 2
-            [k,v0] = EulerOrder02(L,ElemData,v);
+            [k,v0] = AxialPrism3D(L,ElemData,v,lamda);
           otherwise
             [k,v0] = EulerOrder00(L,ElemData,v);
         end
       case 1
         switch ElemData.Form
+          case 2
+            [k,v0] = AxialPrism3D(L,ElemData,v,lamda);
           case 0   % Standard Timoshenko
             [k,v0] = ShearOrder00(L,ElemData,v);
         end
     end
+
     % Condense out hinges
-    k = hinge_stiff(k,ElemData);
+    k = TangentRelease(k,ElemData);
     % basic force-deformation relation
     q = k*(v - v0);
     ElemResp.q  = q;
@@ -118,19 +127,22 @@ switch action
       case 0
         switch ElemData.Form
           case 2
-            [k,v0] = EulerOrder02(L,ElemData,v);
+            [k,v0] = AxialPrism3D(L,ElemData,v,ElemState.lamda);
 
           otherwise
             [k,v0] = EulerOrder00(L,ElemData,v);
         end
       case 1
         switch ElemData.Form
+          case 2
+            [k,v0] = AxialPrism3D(L,ElemData,v,ElemState.lamda);
           case 0   % Standard Timoshenko
             [k,v0] = ShearOrder00(L,ElemData,v);
         end
     end
+
     % Condense out hinges
-    k = hinge_stiff(k,ElemData);
+    k = TangentRelease(k,ElemData);
 
     % basic force-deformation relation
     q = k*(v - v0);
@@ -151,6 +163,7 @@ switch action
     ElemState.p = p;
     ElemState.ConvFlag = true;       % element does not involve iterations
     ElemResp = ElemState;
+
 % ==========================================================================================
   case 'mass'
     %% lumped mass vector and consistent mass matrix
@@ -167,6 +180,7 @@ switch action
     ElemMass.ml = ml;
     ElemMass.mc = mc;
     ElemResp    = ElemMass;
+
 % ==========================================================================================
   case 'post'
     %% post-processing information - coordinates of deformed shape
@@ -181,13 +195,13 @@ switch action
     % basic force-deformation
     switch ElemData.Form
       case 2
-        [k,v0] = EulerOrder02(L,ElemData,v);
+        [k,v0] = AxialPrism3D(L,ElemData,v,ElemState.lamda);
 
       otherwise
         [k,v0] = EulerOrder00(L,ElemData,v);
     end
     % Condense out hinges
-    k = hinge_stiff(k,ElemData);
+    k = TangentRelease(k,ElemData);
 
     % basic force-deformation relation
     q = k*(v - v0);
@@ -281,7 +295,7 @@ function [k,v0] = ShearOrder00(L,ElemData,v)
   az = 12*EIz/(G*Az*L^2);
   ay = 12*EIy/(G*Ay*L^2);
 
-  % set up stiffness matrix in basic system
+  % Set up stiffness matrix in basic system
   kzii = (4+az)/(1+az)*EIz/L;
   kyii = (4+ay)/(1+ay)*EIy/L;
   kzij = (2-az)/(1+az)*EIz/L;
@@ -299,54 +313,73 @@ function [k,v0] = ShearOrder00(L,ElemData,v)
   v0 = zeros(6,1);
 end
 
-%% ---- function EulerOrder02 --------------------------------------------------------------
-function [k,v0] = EulerOrder02(L,ElemData,v)
+%% ---- function AxialPrism3D --------------------------------------------------------------
+function [k,v0] = AxialPrism3D(L,ElemData,v,lamda)
 % state determination of basic 3d frame element
 %  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   % Extract element parameters
-  A  = ElemData.A;
+  EA = ElemData.E*ElemData.A;
   Iy = ElemData.Iy;
   Iz = ElemData.Iz;
   J  = ElemData.J;
   E  = ElemData.E;
-  G  = ElemData.G;
   Iyz = ElemData.Iyz;
 
-  EA  = E * A;
   EIy = E * Iy;
   EIz = E * Iz;
-  GJ  = G * J;
+  GJ  = ElemData.G * ElemData.J;
 
   % Axial force
-  qa = EA/L.*v(1);
+  if ~isfield(ElemData, "N")
+    qa = EA/L.*v(1);
+  else
+    qa = ElemData.N;
+  end
+
+  % Torque
+  if ~isfield(ElemData, "T")
+    T =  GJ.*v(4)/L;
+  else
+    T = ElemData.T*lamda;
+  end
 
   %
   I = eye(2);
   O = zeros(2,2);
 
-  % Form section stiffness
-  ks = E*[Iz  Iyz; 
-          Iyz Iy ];
+  Dx = [0 -1;
+        1  0];
 
-  % Modify for shear stiffness
-  if isfield(ElemData, 'Ay')
-    Ay = ElemData.Ay;
-    Az = ElemData.Az;
-    kv = G*[Ay  0;
-             0 Az]; 
-    ks = ks*[0 -1; 1 0]*(eye(2) - qa*inv(kv));
+  % Form flexural section stiffness
+  km = E*[Iy  Iyz;
+          Iyz Iz ];
+
+  % Modify for shear flexibility
+  if  ElemData.Shear
+    GAy = ElemData.G*ElemData.Ay;
+    GAz = ElemData.G*ElemData.Az;
+    Phi = [1/GAy  0;
+            0    1/GAz];
+  else
+    Phi = O;
   end
+
+  A  = Dx*(I + qa*Phi);
+
+  C  = Dx*km*A;
 
   % Set up generalized "Psi" matrix
 
-  P =-[1  0; 
+  P = [1  0; 
        0  1]*qa;
+  
+  Ci = inv(C);
 
-  Y = [O  I     O    O 
-       O  O     I    O
-       O  O     O    I
-       O  O  -ks\P   O];
+  Y = [O  I     O      O 
+       O  O     I      O
+       O  O     O      I
+       O  O  -Ci*P  -Ci*Dx*T];
 
   % Compute matrix exponential and extract submatrices
   eY  = expm(Y*L);
@@ -362,30 +395,50 @@ function [k,v0] = EulerOrder02(L,ElemData,v)
   E33 = eY(5:6,5:6);
   E34 = eY(5:6,7:8);
 
+  E42 = eY(7:8,3:4);
+  E43 = eY(7:8,5:6);
   E44 = eY(7:8,7:8);
+
   %  Note that the following blocks should be zero:
   %     eY(7:8,3:4) == 0
   %     eY(7:8,5:6) == 0
 
+  % Condense out c2 using boundary condition; Note
+  % c2 = B3 c3 + B4 c4
+  B3  = -E12\E13;
+  B4  = -E12\E14;
+
+  %
   % Set up stiffness matrix in basic system
-  H3  = -E12\E13;
-  H4  = -E12\E14;
 
-  F   = [    H3            H4
-         E22*H3 + E23  E22*H4 + E24];
 
-  kb  =    [    ks*I               O 
-            ks*E32*H3+ks*E33  ks*E32*H4+ks*E34]*inv(F);
+  %        c3            c4
+  Fa  = [  B3            B4               % u'(0)
+           O             I                % u'''(0)
+          E22*B3+E23   E22*B4+E24         % u'(L)
+          E42*B3+E43   E42*B4+E44];       % u'''(L)
+
+  %        u'     u'''(0)       u'(L)   u'''(L)
+  Fb  = [  Dx  -Dx*Phi*Dx*km*A   O      O                % theta(0)
+            O      O            Dx    -Dx*Phi*Dx*km*A];  % theta(L)
+
+  Fc = Fb*Fa;
+
+  Kc  =  [-Dx*C                O 
+          -Dx*C*(E32*B3+E33) -Dx*C*(E32*B4+E34)];
+
+  kb  = Kc*inv(Fc);
 
 
   %     |      |       theta_z     | theta_x |     theta_y       |
   %     |      |     i          j  |         |    i         j    |
   k   = [ EA/L       0          0       0         0         0    ;
-            0   -kb(1,1)   -kb(1,3)     0     -kb(1,2)  -kb(1,4) ;  % i theta_z
-            0    kb(3,1)    kb(3,3)     0      kb(3,2)   kb(3,4) ;  % j
+            0   -kb(2,2)   -kb(2,4)     0     -kb(2,1)  -kb(2,3) ;  % i theta_z
+            0    kb(4,2)    kb(4,4)     0      kb(4,1)   kb(4,3) ;  % j
             0        0          0     GJ/L        0         0    ;  %   theta_x
-            0   -kb(2,1)   -kb(2,3)     0     -kb(2,2)  -kb(2,4) ;  % i theta_y
-            0    kb(4,1)    kb(4,3)     0      kb(4,2)   kb(4,4) ]; % j
+            0   -kb(1,2)   -kb(1,4)     0     -kb(1,1)  -kb(1,3) ;  % i theta_y
+            0    kb(3,2)    kb(3,4)     0      kb(3,1)   kb(3,3) ]; % j
+
 
   % TODO
   %% initial element deformations due to element loading and non-mechanical effects
@@ -398,24 +451,27 @@ function [k,v0] = EulerOrder02(L,ElemData,v)
   v0(2:3) = w(2)*L^3/(24*EIz).*[ 1;-1] + e0(2)*L/2.*[-1; 1];
   v0(5:6) = w(3)*L^3/(24*EIy).*[-1; 1] + e0(3)*L/2.*[ 1;-1];
 
+  v0(4) =            0.5*(T/GJ)*L; %*L*L;
+
 end
 
 
-function k = hinge_stiff(k, ElemData)
+function k = TangentRelease(k, ElemData)
   %%    compatibility matrix in the presence of axial and/or moment releases
   % introduce release indices MR: 0 indicates no hinge, 1 indicates hinge
   MR = zeros(6,1);
   if isfield(ElemData,'Release'), MR(ElemData.Release==1) = 1; end
 
-  ah1 = [ 1-MR(1)       0                    0;
+  ahi = [ 1-MR(1)       0                    0;
            0            1-MR(2)        -0.5*(1-MR(3))*MR(2);
            0      -0.5*(1-MR(2))*MR(3)       1-MR(3)        ];
 
-  ah2 = [ 1-MR(4)       0                    0;
+  ahj = [ 1-MR(4)       0                    0;
            0            1-MR(5)        -0.5*(1-MR(6))*MR(5);
            0      -0.5*(1-MR(5))*MR(6)       1-MR(6)        ];
 
-  ah  = [ah1 zeros(3); zeros(3) ah2];
+  ah  = [  ahi    zeros(3);
+         zeros(3)   ahj   ];
 
   % transform stiffness matrix for the presence of releases
   k   = ah'*k*ah;
