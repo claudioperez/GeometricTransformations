@@ -1,4 +1,6 @@
 import sys
+import veux
+from veux import RenderError, read_model
 import numpy as np
 from scipy.spatial.transform import Rotation
 
@@ -127,7 +129,7 @@ def plot_extruded_frames(renderer, solution=None, time=None, options=None):
     if solution is not None:
         displ = solution.displacements(time)
 
-    sections = sees.get_section_geometries(renderer.model, renderer.config)
+    sections = veux.get_section_geometries(renderer.model, renderer.config)
 
     nodes = renderer.model["nodes"]
 
@@ -163,7 +165,7 @@ def plot_extruded_frames(renderer, solution=None, time=None, options=None):
         else:
             section = section*0.98
             X = np.array(el["crd"])
-            R = [sees.orientation(el["crd"], el["trsfm"]["yvec"]).T]*N
+            R = [veux.orientation(el["crd"], el["trsfm"]["yvec"]).T]*N
 
         # loop over sample points along element length to assemble
         # `coord` and `triang` arrays
@@ -246,7 +248,7 @@ def _add_moment(renderer, loc=None, axis=None):
     renderer.canvas.plot_mesh(coords, triangles)
 
 def _add_solutions(renderer, res_file=None, rparam=None, **opts):
-    soln = sees.read_displacements(res_file)
+    soln = veux.read_displacements(res_file)
 
 
     if "IterationHistory" in soln:
@@ -270,8 +272,6 @@ def _add_solutions(renderer, res_file=None, rparam=None, **opts):
 
 
 
-import sees
-from sees import RenderError, read_model
 def _render(sam_file, res_file=None, noshow=False, **opts):
     # Configuration is determined by successively layering
     # from sources with the following priorities:
@@ -326,8 +326,8 @@ def _render(sam_file, res_file=None, noshow=False, **opts):
 
 
 if __name__ == "__main__":
-    import sees.__main__
-    config = sees.__main__.parse_args(sys.argv)
+    import veux.parser
+    config = veux.parser.parse_args(sys.argv)
 
     try:
         _render(**config)
