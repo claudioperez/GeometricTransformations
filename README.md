@@ -23,6 +23,8 @@ A completely open-source C++ implementation of the framework is under developmen
 for OpenSees and expected to be completed by 2025. Development is ongoing
 at https://github.com/claudioperez/OpenSeesRT.
 
+All renderings were created with the [`veux`](https://pypi.org/project/veux) library.
+
 <dl>
 <dt><a href="./Elements">Elements/</a></dt>
 <dd>This directory contains the finite elements:
@@ -97,5 +99,5 @@ For an example using "basic" elements, see <a href="./Examples/E00_Cantilever.m"
 
 
 - Perez CM, Filippou FC. On nonlinear geometric transformations of finite elements. Int
-  J Numer Methods Eng. 2024;e7506. doi: 10.1002/nme.7506
+  J Numer Methods Eng. 2024;e7506. doi: [`10.1002/nme.7506`](https://doi.org/10.1002/nme.7506)
 
