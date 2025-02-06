@@ -23,7 +23,7 @@ A completely open-source C++ implementation of the framework is under developmen
 for OpenSees and expected to be completed by 2025. Development is ongoing
 at https://github.com/claudioperez/OpenSeesRT.
 
-All renderings were created with the [`veux`](https://pypi.org/project/veux) library.
+All renderings were created with the [`veux`](https://veux.io) library.
 
 <dl>
 <dt><a href="./Elements">Elements/</a></dt>
