@@ -30,7 +30,7 @@ All renderings were created with the [`veux`](https://veux.io) library.
     <li><a href="./Elements/ExactShear3dFrm.m"><code>ExactShear3dFrm</code></a> 
        Displacement-interpolated shear 3d frame element with Cosserat strains; 
        this element implements the three geometrically exact beam formulations 
-       presented in Appendix B. The implementation of this element in OpenSeesRT is documented <a href="https://opensees.stairlab.io/user/manual/model/elements/ExactFrame.html">here</a>.
+       presented in Appendix B. The implementation of this element in OpenSeesRT is documented <a href="https://opensees.stairlab.io/user/manual/model/elements/frame/ExactFrame.html">here</a>.
     </li>
     <li><a href="./Elements/GeomWrap3dFrm.m"><code>GeomWrap3dFrm</code></a> Wrapper for 3d frame elements. This element
        implements the <em>element wrapper</em> from Section 6 using Algorithm 1
