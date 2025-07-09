@@ -42,7 +42,7 @@ pattern Plain 1 Linear {
 
 set nstep 400
 system Umfpack 
-test NormUnbalance 1e-10 55 0 
+test NormUnbalance 1e-10 60 0 
 numberer RCM 
 constraints Plain 
 algorithm Newton 
