@@ -13,22 +13,28 @@ node 9 70.710678118654740 0.0 29.2893218813452400
 fix 1 1 1 1 1 1 1
 
 
-geomTransf Corotational02 1 0.0 0.0 1.0 
+geomTransf Corotational 1 0.0 0.0 1.0 
 
-section Elastic 1 1e3 10e3 833.33 833.33 500 1666.6667
+set E   1000.0
+set A  10000.0
+set Ay 10000.0
+set Az 10000.0
+set I    833.3333333333334
+set G 500.0
+set J 1666.6666666666667
 
-element forceBeamColumn 1 1 2 5  1  1
-element forceBeamColumn 2 2 3 5  1  1
-element forceBeamColumn 3 3 4 5  1  1
-element forceBeamColumn 4 4 5 5  1  1
-element forceBeamColumn 5 5 6 5  1  1
-element forceBeamColumn 6 6 7 5  1  1
-element forceBeamColumn 7 7 8 5  1  1
-element forceBeamColumn 8 8 9 5  1  1
+element elasticBeamColumn 1 1 2 $A $E $G $J $I $I 1
+element elasticBeamColumn 2 2 3 $A $E $G $J $I $I 1
+element elasticBeamColumn 3 3 4 $A $E $G $J $I $I 1
+element elasticBeamColumn 4 4 5 $A $E $G $J $I $I 1
+element elasticBeamColumn 5 5 6 $A $E $G $J $I $I 1
+element elasticBeamColumn 6 6 7 $A $E $G $J $I $I 1
+element elasticBeamColumn 7 7 8 $A $E $G $J $I $I 1
+element elasticBeamColumn 8 8 9 $A $E $G $J $I $I 1
 
 
 pattern Plain 1 Linear {
-  load 9  0.0 000.0 0.0 0 0 0 ;
+  load 9  0.0 0.0 0.0 0 0 0 ;
 }
 
 system BandGeneral 
@@ -37,11 +43,11 @@ constraints Plain
 algorithm Newton 
 test NormUnbalance 1e-6 20 
 
-integrator LoadControl 0.5 
+integrator LoadControl 0.0
 analysis Static 
 analyze 1 
 
-puts "Iterations: [numIter]"
+puts "  Iterations: [numIter]"
 
 for {set i 1} {$i < 10} {incr i} {
   puts "  Displacement: [nodeDisp $i 1] [nodeDisp $i 2] [nodeDisp $i 3]" 

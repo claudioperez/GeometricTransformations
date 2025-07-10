@@ -37,7 +37,7 @@ element forceBeamColumn 8 8 9 5  1  1
 
 
 pattern Plain 1 Linear {
-  load 9  0.0 000.0 0.0 0 0 0 ;
+  load 9  0.0 600.0 0.0 0 0 0 ;
 }
 
 system BandGeneral 
@@ -50,9 +50,15 @@ integrator LoadControl 0.5
 analysis Static 
 analyze 1 
 
-puts "Iterations: [numIter]"
+puts "  Iterations: [numIter]"
 
-for {set i 1} {$i < 10} {incr i} {
-  puts "  Displacement: [nodeDisp $i 1] [nodeDisp $i 2] [nodeDisp $i 3]" 
-}
+integrator LoadControl 0.25
+analyze 1 
+puts "  Iterations: [numIter]"
+
+integrator LoadControl 0.25
+analyze 1
+puts "  Iterations: [numIter]"
+
+puts "  Displacement: [nodeDisp 9 1] [nodeDisp 9 2] [nodeDisp 9 3]" 
 

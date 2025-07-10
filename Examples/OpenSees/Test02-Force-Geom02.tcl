@@ -16,6 +16,15 @@ fix 1 1 1 1 1 1 1
 geomTransf Corotational02 1 0.0 0.0 1.0 
 
 section Elastic 1 1e3 10e3 833.33 833.33 500 1666.6667
+# section ElasticFrame 1 \
+#   -E   1000.0 \
+#   -A  10000.0 \
+#   -Ay 10000.0 \
+#   -Az 10000.0 \
+#   -Iz   833.3333333333334 \
+#   -Iy   833.3333333333334 \
+#   -G 500.0 \
+#   -J 1666.6666666666667
 
 element forceBeamColumn 1 1 2 5  1  1
 element forceBeamColumn 2 2 3 5  1  1
@@ -28,7 +37,7 @@ element forceBeamColumn 8 8 9 5  1  1
 
 
 pattern Plain 1 Linear {
-  load 9  0.0 000.0 0.0 0 0 0 ;
+  load 9  0.0 600.0 0.0 0 0 0 ;
 }
 
 system BandGeneral 
@@ -41,9 +50,14 @@ integrator LoadControl 0.5
 analysis Static 
 analyze 1 
 
-puts "Iterations: [numIter]"
+puts "  Iterations: [numIter]"
 
-for {set i 1} {$i < 10} {incr i} {
-  puts "  Displacement: [nodeDisp $i 1] [nodeDisp $i 2] [nodeDisp $i 3]" 
-}
+integrator LoadControl 0.25
+analyze 1 
+puts "  Iterations: [numIter]"
 
+integrator LoadControl 0.25
+analyze 1
+puts "  Iterations: [numIter]"
+
+puts "  Displacement: [nodeDisp 9 1] [nodeDisp 9 2] [nodeDisp 9 3]" 
