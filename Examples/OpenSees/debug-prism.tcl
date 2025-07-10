@@ -20,9 +20,6 @@ set I  2.0
 set Ay 2.0
 set Az 2.0
 
-#section Elastic 1 $E $A $Iy  $Iz $G $J 1.0 1.0
-#section FrameElastic 1 -E 1.0 -G 1.0 -A 2.0 -J 2.0 -Iy 2.0 -Iz 2.0 -Ay 2.0 -Az 2.0 
-
 geomTransf Corotational 1 0 0 1 
 
 element $element 1  1 2  $A $E $G $J $I $I $A $A 1

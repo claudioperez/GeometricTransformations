@@ -22,16 +22,16 @@ node  8  8.0 0 0
 node  9  9.0 0 0 
 node 10 10.0 0 0 
 
-element ForceFrame  1 0  1  5 1 1
-element ForceFrame  2 1  2  5 1 1
-element ForceFrame  3 2  3  5 1 1
-element ForceFrame  4 3  4  5 1 1
-element ForceFrame  5 4  5  5 1 1
-element ForceFrame  6 5  6  5 1 1
-element ForceFrame  7 6  7  5 1 1
-element ForceFrame  8 7  8  5 1 1
-element ForceFrame  9 8  9  5 1 1
-element ForceFrame 10 9 10  5 1 1
+element forceBeamColumn  1 0  1  5 1 1
+element forceBeamColumn  2 1  2  5 1 1
+element forceBeamColumn  3 2  3  5 1 1
+element forceBeamColumn  4 3  4  5 1 1
+element forceBeamColumn  5 4  5  5 1 1
+element forceBeamColumn  6 5  6  5 1 1
+element forceBeamColumn  7 6  7  5 1 1
+element forceBeamColumn  8 7  8  5 1 1
+element forceBeamColumn  9 8  9  5 1 1
+element forceBeamColumn 10 9 10  5 1 1
 fix  0 1 1 1 1 1 1 
 fix 10 0 0 0 0 0 0 
 
@@ -41,7 +41,7 @@ pattern Plain 1 Linear {
 }
 
 set nstep 800
-system Umfpack 
+system BandGen 
 test NormUnbalance 1e-10 55 0 
 numberer RCM 
 constraints Plain 

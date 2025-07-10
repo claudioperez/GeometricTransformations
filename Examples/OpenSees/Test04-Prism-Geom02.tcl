@@ -10,16 +10,16 @@ section ElasticFrame 1 $E $A $I $I $G $J 1.0 1.0
 
 geomTransf Corotational02 1 0 0 1 
 
-node  0 0.0 0 0 
-node  1 1.0 0 0 
-node  2 2.0 0 0 
-node  3 3.0 0 0 
-node  4 4.0 0 0 
-node  5 5.0 0 0 
-node  6 6.0 0 0 
-node  7 7.0 0 0 
-node  8 8.0 0 0 
-node  9 9.0 0 0 
+node  0  0.0 0 0 
+node  1  1.0 0 0 
+node  2  2.0 0 0 
+node  3  3.0 0 0 
+node  4  4.0 0 0 
+node  5  5.0 0 0 
+node  6  6.0 0 0 
+node  7  7.0 0 0 
+node  8  8.0 0 0 
+node  9  9.0 0 0 
 node 10 10.0 0 0 
 
 element PrismFrame  1 0  1  -section 1 -transform 1

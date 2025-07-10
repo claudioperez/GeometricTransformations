@@ -2,7 +2,7 @@
 
 
 for i in 1 2 3 4; do
-  cat - <<END
+  cat <<END
 
 ----------------
 Test $i
@@ -15,11 +15,11 @@ END
   printf "\nc) Corotational02 (xara)\n"
   xara     Test0$i-Force-Geom02.tcl
   printf "\nc) Corotational03 (xara)\n"
-  Crisfield=1 xara     Test0$i-Force-Geom02.tcl
+  Crisfield=1 xara Test0$i-Force-Geom02.tcl
 done
 
 
-cat - <<END
+cat <<END
 
 ----------------
 Test 5

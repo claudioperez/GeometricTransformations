@@ -40,7 +40,7 @@ pattern Plain 1 Linear {
 }
 
 set nstep 800
-system Umfpack 
+system BandGen 
 test NormUnbalance 1e-10 55 0 
 numberer RCM 
 constraints Plain 

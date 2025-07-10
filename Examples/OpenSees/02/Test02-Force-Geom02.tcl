@@ -1,3 +1,4 @@
+# Pure flexure of a cantilever
 set element forceBeamColumn
 
 model Basic -ndm 3 -ndf 6

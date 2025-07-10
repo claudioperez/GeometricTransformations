@@ -15,7 +15,12 @@ All tests can be run in a Posix shell by sourcing the script `test.sh`.
 <img src="Test01.gif">
 This example demonstrates a severe bug in the existing corotational formulation.
 </dd>
-<dt><b>Test 02</b> - <em>Convergence with Bathe's Cantilever</em></dt>
+<dt><b>Test 02</b> - <em>Accuracy in pure flexure</em></dt>
+<dd>
+<img src="02/image.png">
+</dd>
+
+<dt><b>Test 03</b> - <em>Convergence with Bathe's Cantilever</em></dt>
 <dd>
 This example demonstrates the convergence characteristics of the new corotational transformations.
 The standard problem of a curved 45-degree cantilever is implemented.
@@ -30,6 +35,14 @@ The following variants are investigated:
  <dd>
  </dd>
  </dl>
+</dd>
+<dt><b>Test 04</b><em> - Reliability under large rotations</em></dt>
+<dd>
+<img src="04/image.png">
+</dd>
+
+<dt><b>Test 05</b><em>- Computational efficiency</em></dt>
+<dd>
 </dd>
 <dt><b>Test 06</b></dt>
 <dd>This example demonstrates the use of the Corotational02 transformation to represent a shear-deformable cantilever.
