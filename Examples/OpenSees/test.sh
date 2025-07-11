@@ -9,13 +9,13 @@ Test $i
 ----------------
 END
   printf "\na) Corotational (OpenSees)\n"
-  OpenSees Test0$i-Force-Geom01.tcl -noHeader 
+  OpenSees 0$i/Test0$i-Force-Geom01.tcl -noHeader 
   printf "\nb) Corotational   (xara)\n"
-  xara     Test0$i-Force-Geom01.tcl
+  xara     0$i/Test0$i-Force-Geom01.tcl
   printf "\nc) Corotational02 (xara)\n"
-  xara     Test0$i-Force-Geom02.tcl
+  xara     0$i/Test0$i-Force-Geom02.tcl
   printf "\nc) Corotational03 (xara)\n"
-  Crisfield=1 xara Test0$i-Force-Geom02.tcl
+  Crisfield=1 xara 0$i/Test0$i-Force-Geom02.tcl
 done
 
 
