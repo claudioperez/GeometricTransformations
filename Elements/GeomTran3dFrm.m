@@ -123,12 +123,13 @@ switch action
     [Pres, BasicState] = GeomTran3dFrm_Pull(ElemData.CoroData, xyz, ElemState, ElemData.ElemType);
     Pres.Local      = BasicState;
     % matrix of rigid body modes;
-    av = [-1    0    0    0    0    0    1    0    0    0    0    0
-           0    0    0    0    0    1    0    0    0    0    0    0
-           0    0    0    0    0    0    0    0    0    0    0    1
-           0    0    0   -1    0    0    0    0    0    1    0    0
-           0    0    0    0    1    0    0    0    0    0    0    0
-           0    0    0    0    0    0    0    0    0    0    1    0];
+    %      N   Vy   Vz   T    My   Mz  | N   Vy   Vz    T   My   Mz
+    av = [-1    0    0    0    0    0    1    0    0    0    0    0   % N
+           0    0    0    0    0    1    0    0    0    0    0    0   % Mz
+           0    0    0    0    0    0    0    0    0    0    0    1   % Mz
+           0    0    0   -1    0    0    0    0    0    1    0    0   % T
+           0    0    0    0    1    0    0    0    0    0    0    0   % My
+           0    0    0    0    0    0    0    0    0    0    1    0]; % My
 
     BasicState.v    = av*Pres.Local.u(:);
     BasicState.Dv   = av*Pres.Local.Du(:);

@@ -17,9 +17,12 @@ parameterizations.
 This repository contains the source code for the investigation presented by Perez and Filippou (2024).
 The MATLAB implementation requires the [FEDEASLab](https://fedeas.net) toolbox for nonlinear structural analysis
 which may be obtained from the author upon reasonable request.
+
 A completely open-source C++ implementation of the framework is under development 
-for OpenSees and expected to be completed by 2025. Development is ongoing
-at https://github.com/claudioperez/OpenSeesRT.
+for OpenSees and expected to be completed in 2025. Development is ongoing
+at https://github.com/peer-open-source/xara.
+
+All renderings were created with the [`veux`](https://veux.io) library.
 
 All renderings were created with the [`veux`](https://veux.io) library.
 
