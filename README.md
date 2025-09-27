@@ -24,8 +24,6 @@ at https://github.com/peer-open-source/xara.
 
 All renderings were created with the [`veux`](https://veux.io) library.
 
-All renderings were created with the [`veux`](https://veux.io) library.
-
 <dl>
 <dt><a href="./Elements">Elements/</a></dt>
 <dd>This directory contains the finite elements:
